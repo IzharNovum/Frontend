@@ -1,0 +1,15 @@
+@import "../../css-config/mixin.scss";
+
+
+.Content{
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  #loader{
+    height: 400px;
+    width: 400px;
+  }
+}
