@@ -10,10 +10,12 @@ const AuditLogs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortLevel, setSortLevel] = useState("");
   const [sortCategory, setSortCategory] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [selectedLogs, setSelectedLogs] = useState([]);
 
   useEffect(() => {   //WEBSOCKET CONNECT TO RECEIVE DATA FROM BCKEND...
-    console.log("Attempting to create WebSocket connection...");
+    console.log("Attempting to create WebSocket connection...");      
 
     const ws = new WebSocket("ws://localhost:3002");
 
@@ -25,12 +27,14 @@ const AuditLogs = () => {
       console.log("Message from server:", event.data);
       try {
         const logData = JSON.parse(event.data);
-
+        
         const formattedLog =
-          `${logData.ExchangeService}\u2003 : \u2003 [${logData.timestamp}]\u2003--\u2003 ` +
-          `[${logData.level}]\u2003--\u2003 ${logData.Category}\u2003--\u2003 ` +
-          `${logData.userName}\u2003--\u2003 ${logData.endPoint}\u2003==> \u2003 ` +
-          `${logData.message}`;
+        `[${logData.timestamp}]\u2003--\u2003 ` +
+        `[${logData.level}]\u2003--\u2003 ${logData.category}\u2003--\u2003 ` +
+        `${logData.userName ? `${logData.userName}` : ""}\u2003--\u2003 ` +
+        `${logData.endPoint ? `${logData.endPoint}` : ""}\u2003==> \u2003 ` +
+        `${logData.message}`;
+    
 
         setMessages((prevMessages) => {
           const updatedMessages = [
@@ -59,25 +63,6 @@ const AuditLogs = () => {
     };
   }, []);
 
-
-
-              // ...Over-Ride...
-  // const getColorByLogLevel = (level) => {
-  //   switch (level) {
-  //     case "INFO":
-  //       return "#2ecc71"; // Emerald Green
-  //     case "ERROR":
-  //       return "#e74c3c"; // Cinnabar Red
-  //     case "WARN":
-  //       return "#95a5a6"; // Light Gray
-  //     case "DEBUG":
-  //       return "#3498db"; // Sky Blue
-  //     case "CRITICAL":
-  //       return "#c0392b"; // Dark Red
-  //     default:
-  //       return "black"; // Default Black
-  //   }
-  // };
   const getColorByLogLevel = (level) => {
     switch (level) {
       case "INFO":
@@ -143,7 +128,7 @@ const AuditLogs = () => {
   };
 
 
-  const filteredMessages = messages.filter((msg) => {
+const filteredMessages = messages.filter((msg) => {
     //SEARCH FILTER LOGIC....
     const matchesSearchQuery = msg.formattedLog
       .toLowerCase()
@@ -156,16 +141,17 @@ const AuditLogs = () => {
 
       //FILTERING BASED ON CATEGORY....
     const matchesSortCategory = sortCategory
-      ? sortCategory
-          .split(",")
-          .some(
-            (category) => msg.Category.toLowerCase() === category.toLowerCase()
-          )
-      : true;
+    ? (msg.category || "").toLowerCase() === sortCategory.toLowerCase()
+    : true;
 
-    return matchesSearchQuery && matchesSortLevel && matchesSortCategory;
+    //FILTERING TIMESTAMP...
+      const matchesTimeRange =
+      (!startTime && !endTime) ||
+      (new Date(msg.timestamp) >= new Date(startTime) && new Date(msg.timestamp) <= new Date(endTime));
+
+    return matchesSearchQuery && matchesSortLevel && matchesSortCategory && matchesTimeRange;
   });
-
+  
   return (
     <div id="audit">
       <div id="container">
@@ -209,13 +195,10 @@ const AuditLogs = () => {
                 onChange={(e) => setSortCategory(e.target.value)}
               >
                 <option value="">All Categories</option>
-                <option value="Balance">Balance</option>
-                <option value="Place-Order,PlaceOrder-API">PlaceOrder</option>
-                <option value="Pending-Order,PendingOrder">PendingOrder</option>
-                <option value="Cancele-Order,CancelOrder">CancelOrder</option>
-                <option value="Place-Order,FetchOrder">FetchOrder</option>
-                <option value="Trades">Trades</option>
-                <option value="Klines">Klines</option>
+                <option value="Auth">Auth</option>
+                <option value="Payment">Payment</option>
+                <option value="DataBase">DataBase</option>
+                <option value="EXCHANGE">Exchange</option>
               </select>
             </form>
           </div>
@@ -257,6 +240,16 @@ const AuditLogs = () => {
 
         <div className="text">
           <p>AUDIT LOGS...</p>
+          <div id="timerange">
+              <div className="startime">
+                <label htmlFor="text">Start Time:</label>
+                <input type="datetime-local" className="filtertime" onChange={(e) => setStartTime(e.target.value)}/>
+              </div>
+              <div className="endtime">
+                <label htmlFor="text">End Time:</label>
+                <input type="datetime-local" className="filtertime"  onChange={(e) => setEndTime(e.target.value)}/>
+              </div>
+          </div>
         </div>
 
         {/* CONTAINER 2 */}
@@ -291,7 +284,7 @@ const AuditLogs = () => {
                 );
               })
             ) : (
-              <h2>No Log found....</h2> //IF NO LOGS THEN DISPLAYS THIS...
+              <h2>No Log found....</h2> //IF NO LOGS THEN DISPLAYS
             )}
           </div>
         </div>

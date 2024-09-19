@@ -1,7 +1,8 @@
-import "./App.css";
+// import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Container from "./Components/Container/Container.jsx";
 import Loader from "./Components/Loader/Loader.jsx";
+
 
 function App() {
   return (

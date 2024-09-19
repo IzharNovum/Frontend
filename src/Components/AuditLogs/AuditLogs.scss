@@ -258,6 +258,9 @@
     //AUDIT TEXT....
     .text {
       width: 95%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
       p {
         font-size: 0.9rem;
@@ -265,6 +268,55 @@
         color: rgb(33, 32, 32, 0.6);
         display: flex;
         align-items: end;
+      }
+
+      #timerange{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        @include md{
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .startime{
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .endtime{
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 5px;
+        }
+
+        label{
+          font-weight: bold;
+          font-size: 0.5rem;
+
+          @include md{
+            font-weight: bold;
+            font-size: 0.9rem;
+          }
+        }
+        input{
+          margin: 5px;
+          font-size: 0.4rem;
+          padding: 5px;
+
+          @include md{
+            margin: 5px;
+            font-size: 0.6rem;
+            padding: 5px;
+  
+          }
+        }
       }
     }
 
